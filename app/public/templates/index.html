@@ -1,0 +1,28 @@
+{% extends "base_template.html" %}
+{% block title %}Proyecto 1 - Grupo 05{% endblock %}
+{% block content %}
+    <br>
+    <br>
+    <br>
+
+    <ul>
+    {% if current_user.is_anonymous %}
+        {% for concurso in concursos %}
+        <li>
+            <a href="{{ concurso.public_url() }}">{{ concurso.nombre }}</a>
+        </li>
+        {% endfor %}
+    {% else %}
+        {% for concurso in concursos %}
+        <li>
+            
+            <a href="{{ concurso.public_url() }}">{{ concurso.nombre }}</a>
+            <a href="{{ concurso.concurso_delete() }}">Eliminar</a>
+            <a href="{{ concurso.concurso_update() }}">Actualizar</a>
+
+        </li>
+    {% endfor %}
+    {% endif %}
+    </ul>
+{% endblock %}
+

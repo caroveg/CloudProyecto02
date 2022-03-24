@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="generator" content="Hugo 0.88.1">
+
+
+
+    <!-- Bootstrap core CSS -->
+        <link href="../static/sytles/bootstrap.min.css" rel="stylesheet">
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light  navbar-dark bg-dark fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{ url_for('public.index') }}">Supervoices</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarText">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {% if current_user.is_anonymous %}
+        </li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('public.principal') }}">Concursos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.show_signup_form') }}">Registro</a></li>
+        {% else %}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('public.principal') }}">Concursos</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.concurso_form') }}">Nuevo Concurso</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Cerrar sesión</a></li>
+                <li class="nav-item"><a class="nav-link"> Bienvenid@ {{ current_user.email }}</li>
+            {% endif %}
+      </ul>
+      <span class="navbar-text">
+        Equipo 5
+      </span>
+    </div>
+  </div>
+</nav>
+{% block content %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,84 @@
+{% extends "base_template.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+
+<link href="../../static/sytles/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+
+    <!-- Custom styles for this template -->
+    <link href="../../static/sytles/signin.css" rel="stylesheet">
+<main class="form-signin">
+  <form action="" method="post" novalidate enctype="multipart/form-data">
+      {{ form.hidden_tag() }}
+    <img class="mb-4" src="../../static/sytles/supervoices.png" alt="">
+
+    <label for="form-control">Concurso</label><br>
+        {{ form.concurso_id }}
+    <div class="mb-3">
+    <label for="formFile" class="form-label">Voz</label>
+        {{ form.path_audio(class_="form-control form-control-sm", type="file", id="formFile") }}
+    </div>
+     <label for="form-control">Nombres</label>
+       {{ form.nombres(class_="form-control form-control-sm") }}
+      <label for="form-control">Apellidos</label>
+        {{ form.apellidos(class_="form-control form-control-sm") }}
+      <label for="form-control">Email</label>
+        {{ form.mail(class_="form-control form-control-sm") }}
+      <label for="form-control">Observaciones</label>
+        {{ form.observaciones(class_="form-control form-control-sm", size=32) }}
+        <br>
+        <br>
+      {{ form.submit(class_="w-100 btn btn-lg btn-primary") }}
+
+	{% for message in get_flashed_messages() %}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    .alert {
+        padding: 20px;
+        background-color: #f44336;
+        color: white;
+    }
+    .alert.success {background-color: #4CAF50;}
+
+    .closebtn {
+        margin-left: 15px;
+        color: white;
+        font-weight: bold;
+        float: right;
+        font-size: 22px;
+        line-height: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+}
+
+    .closebtn:hover {
+        color: black;
+}
+    </style>
+
+<div class="alert success">
+  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+  <strong>Proceso Exitoso!</strong> {{ message }}</div>
+    {% endfor %}
+
+
+  </form>
+</main>
+{% endblock %}

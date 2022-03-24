@@ -1,0 +1,81 @@
+{% extends "base_template.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+
+<link href="../static/sytles/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+
+    <!-- Custom styles for this template -->
+    <link href="../static/sytles/signin.css" rel="stylesheet">
+<main class="form-signin">
+  <form action="" method="post" novalidate>
+      {{ form.hidden_tag() }}
+    <img class="mb-4" src="../static/sytles/supervoices.png" alt="">
+
+      <label for="form-control">Nombres</label>
+        {{ form.nombres(class_="form-control form-control-sm") }}
+      <label for="form-control">Apellidos</label>
+        {{ form.apellidos(class_="form-control form-control-sm") }}
+      <label for="form-control">Email</label>
+        {{ form.email(class_="form-control form-control-sm") }}
+      <label for="form-control">Contraseña</label>
+        {{ form.password(class_="form-control form-control-sm", size=32) }}
+      <label for="form-control">Confirmar Contraseña</label>
+        {{ form.password2(class_="form-control form-control-sm", size=32) }}
+
+      {{ form.submit(class_="w-100 btn btn-lg btn-primary") }}
+
+   <div>¿ya tienes cuenta? <a href="{{ url_for('auth.login') }}">Iniciar Sesión</a></div>
+    <p class="mt-5 mb-3 text-muted" align="center">&copy; Equipo 5 2022</p>
+
+  {% for message in get_flashed_messages() %}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    .alert {
+        padding: 20px;
+        background-color: #f44336;
+        color: white;
+    }
+
+    .closebtn {
+        margin-left: 15px;
+        color: white;
+        font-weight: bold;
+        float: right;
+        font-size: 22px;
+        line-height: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+}
+
+    .closebtn:hover {
+        color: black;
+}
+    </style>
+
+<div class="alert">
+  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+  <strong>Error</strong> {{ message }}</div>
+    {% endfor %}
+
+
+  </form>
+</main>
+{% endblock %}

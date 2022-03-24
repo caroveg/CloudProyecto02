@@ -1,0 +1,47 @@
+{% extends "base_template.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+
+<link href="../static/sytles/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+
+    <!-- Custom styles for this template -->
+    <link href="../static/sytles/signin.css" rel="stylesheet">
+<main class="form-signin">
+  <form action="" method="post" novalidate>
+      {{ form.hidden_tag() }}
+    <img class="mb-4" src="../static/sytles/supervoices.png" alt="">
+
+      <label for="form-control">Email</label>
+        {{ form.email(class_="form-control form-control-sm") }}
+      <label for="form-control">Contraseña</label>
+        {{ form.password(class_="form-control form-control-sm") }}
+    <div class="checkbox mb-3">
+      <label>
+        {{ form.remember_me(class_="checkbox") }} {{ form.remember_me.label }}
+      </label>
+    </div>
+      {{ form.submit(class_="w-100 btn btn-lg btn-primary ") }}
+
+   <div>¿No tienes cuenta? <a href="{{ url_for('auth.show_signup_form') }}">Regístrate</a></div>
+    <p class="mt-5 mb-3 text-muted" align="center">&copy; Equipo 5 2022</p>
+
+  </form>
+</main>
+{% endblock %}
