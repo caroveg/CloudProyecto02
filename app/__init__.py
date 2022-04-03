@@ -22,17 +22,8 @@ def create_app():
     login_manager.login_view = "auth.login"
 
     db.init_app(app)
-    #El encargado de hacer jobs perodicamente
-    scheduler.init_app(app)
-    scheduler.start()    
-
-    from .cronJob import jobAudios
-    @scheduler.task('interval', id='job_process', seconds=20, misfire_grace_time=120)
-    def cronTask():
-        with scheduler.app.app_context():
-            jobAudios()
-            
-            
+    #El encargado de hacer jobs perodicamente   
+        
 
     # Registro de los Blueprints
     from .auth import auth_bp
