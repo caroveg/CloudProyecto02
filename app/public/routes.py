@@ -9,18 +9,11 @@ import math
 
 @public_bp.route("/")
 def index():
-   # concursos = Concurso.get_all()
-   # concursos = Concurso.get_by_user(0)
-   # if current_user.is_authenticated:
-   #     concursos = Concurso.get_by_user(current_user.id)
     return render_template("principal.html")
 
 @public_bp.route("/concursos")
 def principal():
     concursos = Concurso.get_all()
-    # concursos = Concurso.get_by_user(0)
-    # if current_user.is_authenticated:
-    #     concursos = Concurso.get_by_user(current_user.id)
     return render_template("index.html", concursos=concursos)
 
 #@public_bp.route("/concursos/<string:url>/")
@@ -29,11 +22,6 @@ def principal():
 @public_bp.route("/concursos/<string:url>/<int:page>")
 def show_concurso(page,url):
     concurso = Concurso.get_by_url(url)
-    #participantes = Participante.query.filter_by(concurso_id='{}'.format(url)).order_by(Participante.fechaCreacion.desc()).slice(0, 20).all()
-    #participantes = Participante.get_by_Concurso_id(concurso.id)
-    #if concurso is None:
-    #    abort(404)
-    #return render_template("concurso_view.html", concurso=concurso, voz=participantes)
     participantes = Participante.query.filter_by(concurso_id='{}'.format(concurso.id)).order_by(Participante.fechaCreacion.desc()).paginate(page=page, per_page=20).items
     number_pages = Participante.query.filter_by(concurso_id='{}'.format(concurso.id)).count()
     if number_pages<= 20:
@@ -54,9 +42,6 @@ def show_participante(participante_id):
 #@public_bp.route("/public/participante/<int:participante_id>/", methods=['GET', 'POST','PUT'])
 def participante_form(concurso_id):
     form = ParticipanteForm(concurso_id)
-    #choices_concursos = Concurso.query.with_entities(Concurso.url).all()
-    #list_concursos = [tup[0] for tup in choices_concursos]
-    #form.concurso_id.choices = list_concursos
     print(concurso_id)
     if form.validate_on_submit():
         concurso_id =form.concurso_id
