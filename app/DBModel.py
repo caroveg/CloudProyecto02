@@ -9,9 +9,10 @@ app = Flask(__name__)
 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///DB_proyecto1.db' 
 db = SQLAlchemy(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://Cloud2022:UsuarioCloud2022@modelodespliequea.crbchgb8swzt.us-east-1.rds.amazonaws.com/proyecto1'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Jirafa159*@db01.crbchgb8swzt.us-east-1.rds.amazonaws.com/DB_DESP_C'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'UsuarioCloud2022'
+app.secret_key = 'Jirafa159*'
 
 
 from flask_login import UserMixin
