@@ -6,6 +6,7 @@ import os
 from app.models import Concurso, Participante
 from . import admin_bp
 from .forms import ConcursoForm
+import boto3
 
 
 
@@ -14,6 +15,7 @@ from .forms import ConcursoForm
 @login_required
 def concurso_form(concurso_id): 
     form = ConcursoForm()
+    
     if form.validate_on_submit():
         nombre = form.nombre.data
         path_imagen = secure_filename(form.imagen.data.filename)
@@ -36,6 +38,11 @@ def concurso_form(concurso_id):
                         ,recomendaciones=recomendaciones
                         ,fechaCreacion=fechaCreacion)
         concurso.save()
+        s3 = boto3.resource('s3')
+        for bucket in s3.buckets.all():
+            data = open("app/static/images_concurso/" + path_imagen, 'rb')
+            s3.Bucket(bucket.name).put_object(Key="/images_concurso/" + path_imagen, Body=data)
+             
         return redirect(url_for('public.index'))
     return render_template("concurso_form.html", form=form)
 

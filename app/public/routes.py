@@ -4,6 +4,9 @@ from werkzeug.utils import secure_filename
 from app.models import Concurso, Participante
 from . import public_bp
 from .forms import ParticipanteForm
+import boto3  
+
+
 
 import math
 
@@ -13,6 +16,7 @@ def index():
    # concursos = Concurso.get_by_user(0)
    # if current_user.is_authenticated:
    #     concursos = Concurso.get_by_user(current_user.id)
+ 
     return render_template("principal.html")
 
 @public_bp.route("/concursos")
@@ -78,8 +82,13 @@ def participante_form(concurso_id):
                         ,convertido=False
                         ,fechaCreacion=fechaCreacion)
         participante.save()
+        s3 = boto3.resource('s3')
+        for bucket in s3.buckets.all():      
+            data = open("app/static/AudioFilesOrigin/" + path_audio, 'rb')
+            s3.Bucket(bucket.name).put_object(Key="/AudioFilesOrigin/" + path_audio, Body=data)
+
         flash('Hemos recibido tu voz y la estamos procesando para que sea publicada en la \
                             página del concurso y pueda ser posteriormente revisada por nuestro equipo de trabajo. \
-                            Tan pronto la voz quede publicada en la página del concurso te notificaremos por email.')
+                            Tan pronto la voz quede publicada en la página, te notificaremos por email.')
         return  redirect(url_for('public.participante_form',concurso_id=concurso_id))
     return render_template("participante_form.html", form=form)

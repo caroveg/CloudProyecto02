@@ -192,3 +192,7 @@ flask/bin/wheel
 flask/bin/wheel-3.8
 flask/bin/wheel3
 app/DB_proyecto1.db
+aws/install
+aws/README.md
+aws/THIRD_PARTY_LICENSES
+awscliv2.zip
