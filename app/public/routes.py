@@ -74,7 +74,7 @@ def participante_form(concurso_id):
         fechaCreacion = datetime.now()
         participante = Participante(concurso_id=concurso_id
                         ,path_audio=path_audio
-			,path_audio_origin=path_audio
+			            ,path_audio_origin=path_audio
                         ,nombres=nombres
                         ,apellidos=apellidos
                         ,mail=mail
@@ -85,7 +85,7 @@ def participante_form(concurso_id):
         s3 = boto3.resource('s3')
         for bucket in s3.buckets.all():      
             data = open("app/static/AudioFilesOrigin/" + path_audio, 'rb')
-            s3.Bucket(bucket.name).put_object(Key="/AudioFilesOrigin/" + path_audio, Body=data)
+            s3.Bucket(bucket.name).put_object(Key="AudioFilesOrigin/" + path_audio, Body=data)
 
         flash('Hemos recibido tu voz y la estamos procesando para que sea publicada en la \
                             página del concurso y pueda ser posteriormente revisada por nuestro equipo de trabajo. \

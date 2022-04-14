@@ -41,7 +41,7 @@ def concurso_form(concurso_id):
         s3 = boto3.resource('s3')
         for bucket in s3.buckets.all():
             data = open("app/static/images_concurso/" + path_imagen, 'rb')
-            s3.Bucket(bucket.name).put_object(Key="/images_concurso/" + path_imagen, Body=data)
+            s3.Bucket(bucket.name).put_object(Key="images_concurso/" + path_imagen, Body=data)
              
         return redirect(url_for('public.index'))
     return render_template("concurso_form.html", form=form)
