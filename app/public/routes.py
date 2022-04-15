@@ -5,6 +5,7 @@ from app.models import Concurso, Participante
 from . import public_bp
 from .forms import ParticipanteForm
 import boto3  
+import os
 
 
 
@@ -82,10 +83,10 @@ def participante_form(concurso_id):
                         ,convertido=False
                         ,fechaCreacion=fechaCreacion)
         participante.save()
-        s3 = boto3.resource('s3')
-        for bucket in s3.buckets.all():      
-            data = open("app/static/AudioFilesOrigin/" + path_audio, 'rb')
-            s3.Bucket(bucket.name).put_object(Key="AudioFilesOrigin/" + path_audio, Body=data)
+        s3 = boto3.resource('s3')     
+        data = open("app/static/AudioFilesOrigin/" + path_audio, 'rb')
+        s3.Bucket("storagedespd").put_object(Key="AudioFilesOrigin/" + path_audio, Body=data)
+        os.remove("app/static/AudioFilesOrigin/" + path_audio)
 
         flash('Hemos recibido tu voz y la estamos procesando para que sea publicada en la \
                             página del concurso y pueda ser posteriormente revisada por nuestro equipo de trabajo. \
