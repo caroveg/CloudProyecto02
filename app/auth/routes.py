@@ -7,6 +7,8 @@ from . import auth_bp
 from .forms import SignupForm, LoginForm
 from .models import User
 
+import redis
+
 @auth_bp.route("/signup/", methods=["GET", "POST"])
 def show_signup_form():
     if current_user.is_authenticated:
@@ -61,4 +63,7 @@ def logout():
 
 @login_manager.user_loader
 def load_user(user_id):
+    REDIS_URL = 'redis://ecdespd.jxemj7.0001.use1.cache.amazonaws.com:6379'
+    #store = redis.Redis.from_url(REDIS_URL)
+    #store.expire(username, 10)
     return User.get_by_id(int(user_id))

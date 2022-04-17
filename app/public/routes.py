@@ -7,8 +7,6 @@ from .forms import ParticipanteForm
 import boto3  
 import os
 
-
-
 import math
 
 @public_bp.route("/")

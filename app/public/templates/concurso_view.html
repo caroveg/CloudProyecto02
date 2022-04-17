@@ -64,7 +64,10 @@
   <br>
   <br>
   <br>
-<img src="/static/images_concurso/{{ concurso.imagen }}" alt="Smiley face" width="120" height="80" style="vertical-align:middle">
+  
+<img src="http://d25jsbtuwtqsio.cloudfront.net/images_concurso/{{ concurso.imagen }}" alt="Smiley face" width="120" height="80" style="vertical-align:middle">
+
+
 
   <br>
   <br>
@@ -118,7 +121,7 @@
                     {% else %}
                         <td><p>En proceso</p></td>
                     {% endif %}
-                    <td><p><p><ul><audio src="/static/AudioFilesDestiny/{{ participantes.path_audio }}" controls> <source src="/static/AudioFilesDestiny/{{ participantes.path_audio }}" type="audio/mp3" ></audio>
+                    <td><p><p><ul><audio src="http://d25jsbtuwtqsio.cloudfront.net/AudioFilesDestiny/{{ participantes.path_audio }}" controls> <source src="http://d25jsbtuwtqsio.cloudfront.net/AudioFilesDestiny/{{ participantes.path_audio }}" type="audio/mp3" ></audio>
                      </ul></p>
                     </div></p></td>
                 </tr>
@@ -146,7 +149,7 @@
                     {% else %}
                         <td><p>En proceso</p></td>
                     {% endif %}
-                    <td><p><p><ul><audio src="/static/AudioFilesDestiny/{{ participantes.path_audio }}" controls> <source src="/static/AudioFilesDestiny/{{ participantes.path_audio }}" type="audio/mp3" ></audio></ul></p></p></td>
+                    <td><p><p><ul><audio src="http://d25jsbtuwtqsio.cloudfront.net/AudioFilesDestiny/{{ participantes.path_audio }}" controls> <source src="http://d25jsbtuwtqsio.cloudfront.net/AudioFilesDestiny/{{ participantes.path_audio }}" type="audio/mp3" ></audio></ul></p></p></td>
                      <td><p><p><a href="{{ url_for('admin.participante_origin_download', filename=participantes.path_audio_origin) }}">Descargar original</a></p></p></td>
                      <td><p><p><a href="{{ url_for('admin.download_participante', filename=participantes.path_audio) }}">Descargar convertida</a></p></p></td>
                         <td><p><p><a href="{{ url_for('public.show_participante', participante_id= participantes.id) }}">Ver detalle</a></p></p></td>

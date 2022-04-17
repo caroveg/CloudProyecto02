@@ -1,27 +1,27 @@
-from flask import Flask
+from flask import Flask, jsonify, render_template
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
+from flask_cdn import CDN
+import os
+from urllib.parse import urljoin
 
 login_manager = LoginManager()
 db = SQLAlchemy()
 scheduler = APScheduler()
+cdn = CDN()
 
 def create_app():
 
     app = Flask(__name__)
+ 
+    app.config['CDN_DOMAIN'] = 'd25jsbtuwtqsio.cloudfront.net'
+    app.config['CDN_DEBUG'] = True
+    app.config['CDN_HTTPS'] = True
+    app.config['CDN_TIMESTAMP'] = False
 
-    #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///DB_proyecto1.db' 
-    #app.config['SECRET_KEY'] = '7110c8ae51a4b5af97be6534caef90e4bb9bdcb3380af008f90b23a5d1616bf319bc298105da20fe'
-    #db = SQLAlchemy(app)
-
-    #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://app:Secreto123@172.24.41.225/proyecto1'
-    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    #app.secret_key = 'Secreto123'
-
-    #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://Cloud2022:UsuarioCloud2022@modelodespliequea.crbchgb8swzt.us-east-1.rds.amazonaws.com/proyecto1'
-    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    #app.secret_key = 'UsuarioCloud2022'
+    cdn.init_app(app)
+    #CDN(app)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Jirafa159*@db01.crbchgb8swzt.us-east-1.rds.amazonaws.com/DB_DESP_C'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -30,9 +30,7 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
 
-    db.init_app(app)
-    #El encargado de hacer jobs perodicamente   
-        
+    db.init_app(app)    
 
     # Registro de los Blueprints
     from .auth import auth_bp
