@@ -6,6 +6,7 @@ from flask_cdn import CDN
 import os
 from urllib.parse import urljoin
 
+
 login_manager = LoginManager()
 db = SQLAlchemy()
 scheduler = APScheduler()
@@ -16,11 +17,8 @@ def create_app():
     app = Flask(__name__)
  
     app.config['CDN_DOMAIN'] = 'd25jsbtuwtqsio.cloudfront.net'
-    app.config['CDN_DEBUG'] = True
-    app.config['CDN_HTTPS'] = True
-    app.config['CDN_TIMESTAMP'] = False
+    CDN(app)
 
-    cdn.init_app(app)
     #CDN(app)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Jirafa159*@db01.crbchgb8swzt.us-east-1.rds.amazonaws.com/DB_DESP_C'

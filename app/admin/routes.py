@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request,send_file
+from flask import render_template, redirect, url_for, request,send_file, send_from_directory
 from flask_login import login_required, current_user
 from datetime import datetime
 from werkzeug.utils import secure_filename
@@ -102,10 +102,14 @@ def  participante_delete(participante_id):
 
 @admin_bp.route('/participante/uploads/<path:filename>', methods=['GET', 'POST'])
 def download_participante(filename):
-    path = "static/AudioFilesDestiny/{}".format(filename)
+    path = "http://d25jsbtuwtqsio.cloudfront.net/AudioFilesDestiny/{}".format(filename)
     return send_file(path, as_attachment=True)
 
 @admin_bp.route('/participante/uploads_origin/<path:filename>', methods=['GET', 'POST'])
 def participante_origin_download(filename):
-    path = "static/AudioFilesOrigin/{}".format(filename)
-    return send_file(path, as_attachment=True)
+    path = "http://d25jsbtuwtqsio.cloudfront.net/AudioFilesOrigin/{}".format(filename)
+    #path = "http://d25jsbtuwtqsio.cloudfront.net/AudioFilesOrigin"
+    print(path)
+    return send_from_directory(path, filename, as_attachment=True)
+    #return send_from_directory(directory=path,path=path)
+   # return send_from_directory(directory=path, as_attachment=True)

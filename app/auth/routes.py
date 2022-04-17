@@ -9,6 +9,32 @@ from .models import User
 
 import redis
 
+REDIS_URL = 'redis://ecdespd.jxemj7.0001.use1.cache.amazonaws.com:6379'
+
+class SessionStore:
+    """Store session data in Redis."""
+
+    def __init__(self, token, url='redis://localhost:6379', ttl=10):
+        self.token = token
+        self.redis = redis.Redis.from_url(url)
+        self.ttl = ttl
+
+    def set(self, key, value):
+        self.refresh()
+        return self.redis.hset(self.token, key, value)
+
+    def get(self, key, value):
+        self.refresh()
+        return self.redis.hget(self.token, key)
+
+    def incr(self, key):
+        self.refresh()
+        return self.redis.hincrby(self.token, key, 1)
+
+    def refresh(self):
+        self.redis.expire(self.token, self.ttl)
+
+
 @auth_bp.route("/signup/", methods=["GET", "POST"])
 def show_signup_form():
     if current_user.is_authenticated:
@@ -48,6 +74,7 @@ def login():
         user = User.get_by_email(form.email.data)
         if user is not None and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
+            store = SessionStore(user, REDIS_URL)
             next_page = request.args.get('next')
             if not next_page or url_parse(next_page).netloc != '':
                 next_page = url_for('public.principal')
@@ -63,7 +90,6 @@ def logout():
 
 @login_manager.user_loader
 def load_user(user_id):
-    REDIS_URL = 'redis://ecdespd.jxemj7.0001.use1.cache.amazonaws.com:6379'
-    #store = redis.Redis.from_url(REDIS_URL)
+    store = redis.Redis.from_url(REDIS_URL)
     #store.expire(username, 10)
     return User.get_by_id(int(user_id))
