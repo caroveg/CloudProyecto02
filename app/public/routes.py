@@ -9,6 +9,7 @@ import math
 
 @public_bp.route("/")
 def index():
+   
     return render_template("principal.html")
 
 @public_bp.route("/concursos")
