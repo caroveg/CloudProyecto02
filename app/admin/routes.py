@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request,send_file, send_from_directory
+from flask import render_template, redirect, url_for, request,send_file, send_from_directory, flash
 from flask_login import login_required, current_user
 from datetime import datetime
 from werkzeug.utils import secure_filename
@@ -6,6 +6,9 @@ import os
 from app.models import Concurso, Participante
 from . import admin_bp
 from .forms import ConcursoForm
+from .. import dynamodb
+import uuid
+
 import boto3
 
 
@@ -14,8 +17,7 @@ import boto3
 @admin_bp.route("/admin/concurso/<int:concurso_id>/", methods=['GET', 'POST','PUT'])
 @login_required
 def concurso_form(concurso_id): 
-    form = ConcursoForm()
-    
+    form = ConcursoForm()  
     if form.validate_on_submit():
         nombre = form.nombre.data
         path_imagen = secure_filename(form.imagen.data.filename)
@@ -38,6 +40,29 @@ def concurso_form(concurso_id):
                         ,recomendaciones=recomendaciones
                         ,fechaCreacion=fechaCreacion)
         concurso.save()
+
+        #Dynamo
+        data = {}
+        data['id'] = uuid.uuid4().hex
+        data['user_id'] = current_user.id
+        data['nombre'] = nombre
+        data['imagen'] = path_imagen
+        data['url'] = url
+        data['valor'] = valor
+        data['fechaInicio'] = fechaInicio.isoformat()
+        data['fechaFin'] = fechaFin
+        data['guion'] = guion
+        data['recomendaciones'] = recomendaciones
+        data['fechaCreacion'] = fechaCreacion.isoformat()
+
+        data = dict((k, v) for k, v in data.items() if v)
+
+        response = dynamodb.Table('concurso').put_item(Item=data)
+        if response:
+            flash('Concurso creado correctamente')
+
+
+        #Almacenamiento en S3
         s3 = boto3.resource('s3')
         for bucket in s3.buckets.all():
             data = open("app/static/images_concurso/" + path_imagen, 'rb')
@@ -108,8 +133,5 @@ def download_participante(filename):
 @admin_bp.route('/participante/uploads_origin/<path:filename>', methods=['GET', 'POST'])
 def participante_origin_download(filename):
     path = "http://d25jsbtuwtqsio.cloudfront.net/AudioFilesOrigin/{}".format(filename)
-    #path = "http://d25jsbtuwtqsio.cloudfront.net/AudioFilesOrigin"
     print(path)
     return send_from_directory(path, filename, as_attachment=True)
-    #return send_from_directory(directory=path,path=path)
-   # return send_from_directory(directory=path, as_attachment=True)
