@@ -29,10 +29,8 @@ def principal():
         response = dynamodb.Table('concurso').scan()
         concursos = response.get('Items')
 
-    return render_template("index2.html", concursos=concursos)
+    return render_template("index.html", concursos=concursos)
 
-#@public_bp.route("/concursos/<string:url>/")
-#def show_concurso(url):
 @public_bp.route("/concursos/<string:url>/", defaults={"page": 1})
 @public_bp.route("/concursos/<string:url>/<int:page>")
 def show_concurso(page,url):

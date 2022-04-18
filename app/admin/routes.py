@@ -11,8 +11,6 @@ import uuid
 
 import boto3
 
-
-
 @admin_bp.route("/admin/concurso/", methods=['GET', 'POST'], defaults={'concurso_id': None})
 @admin_bp.route("/admin/concurso/<int:concurso_id>/", methods=['GET', 'POST','PUT'])
 @login_required
@@ -40,7 +38,6 @@ def concurso_form(concurso_id):
                         ,recomendaciones=recomendaciones
                         ,fechaCreacion=fechaCreacion)
         concurso.save()
-
         #Dynamo
         data = {}
         data['id'] = uuid.uuid4().hex
