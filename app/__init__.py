@@ -26,7 +26,6 @@ dynamodb = boto3.resource('dynamodb',
 )
 
 
-
 #dynamodb = boto3.resource('dynamodb',
 #    aws_access_key_id='ASIATGWEY6Q5LVXJNPHS',
 #    aws_secret_access_key='dS+V8PEt5BShtfqjroI9//utf/cR3utbOwae93Lw',

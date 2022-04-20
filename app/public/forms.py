@@ -6,6 +6,7 @@ from flask_wtf.file import FileField, FileRequired
 class ParticipanteForm(FlaskForm):
     id = IntegerField('id')
     concurso_id = IntegerField('concurso')
+    url = StringField('url')
     path_audio = FileField('Voz', validators=[FileRequired()], render_kw={'placeholder': 'Cargar Voz'})
     nombres = StringField('nombres', validators=[Length(max=128)])
     apellidos = StringField('apellidos', validators=[Length(max=128)])
