@@ -1,3 +1,4 @@
+#ROUTE PUBLICO
 from flask import render_template, redirect, url_for, request, flash
 from datetime import datetime
 from werkzeug.utils import secure_filename
@@ -8,6 +9,7 @@ import boto3
 import os
 from .. import dynamodb
 from boto3.dynamodb.conditions import Key
+import uuid
 
 import math
 
@@ -44,6 +46,11 @@ def show_concurso(page,url):
                         ,guion=data.get('guion')
                         ,recomendaciones=data.get('recomendaciones'))
 
+
+    participantes = []
+    if request.method == 'GET':
+        responsep = tparticipante.scan()
+        participantes = responsep.get('Items')
     
     #participantes = Participante.query.filter_by(concurso_id='{}'.format(concurso.id)).order_by(Participante.fechaCreacion.desc()).paginate(page=page, per_page=20).items
     number_pages = 1 #Participante.query.filter_by(concurso_id='{}'.format(concurso.id)).count()
@@ -51,32 +58,43 @@ def show_concurso(page,url):
         number_pages=1
     else:
         number_pages= int(math.ceil(number_pages/20)+1)
-    return render_template("concurso_view.html", concurso=concurso,  pages=number_pages)
-    #return render_template("concurso_view.html", concurso=concurso, voz=participantes, pages=number_pages)
+    return render_template("concurso_view.html", concurso=concurso, voz=participantes, pages=number_pages)
    
-
-
-@public_bp.route("/participantes/<int:participante_id>/")
+@public_bp.route("/participantes/<string:participante_id>/")
 def show_participante(participante_id):
-    participante = Participante.get_by_id(participante_id)
-    if participante is None:
-        abort(404)
+    response = tparticipante.get_item(
+        Key={'Participante_id': participante_id}
+        )
+    data = response.get('Item')
+    participante = Participante(
+                        participante_id = data.get('participante_id')
+                        ,concurso_id=data.get('concurso_id')
+                        ,url = data.get('url')
+                        ,path_audio=data.get('path_audio')
+			            ,path_audio_origin=data.get('path_audio_origin')
+                        ,nombres=data.get('nombres')
+                        ,apellidos=data.get('apellidos')
+                        ,mail=data.get('mail')
+                        ,observaciones=data.get('observaciones')
+                        ,convertido=data.get('convertido'))
+
     return render_template("participante_view.html", participante=participante)
 
 @public_bp.route("/public/participante/<string:url>", methods=['GET', 'POST'])
 def participante_form(url):
     form = ParticipanteForm(url)
     if form.validate_on_submit():
-       
+
         path_audio = secure_filename(form.path_audio.data.filename)
         form.path_audio.data.save("app/static/AudioFilesOrigin/" + path_audio)
 
         data = {}
-        data['concurso_id'] = uuid.uuid4().hex
-        data['url'] = form.url.data
+        data['Participante_id'] = uuid.uuid4().hex
+        data['id'] = 11
+        data['url'] = url
         data['nombres'] = form.nombres.data
-        data['path_audio'] = form.path_audio.data
-        data['path_audio_origin'] = form.path_audio.data
+        data['path_audio'] = form.path_audio.data.filename
+        data['path_audio_origin'] = form.path_audio.data.filename
         data['apellidos'] = form.url.data
         data['mail'] = form.mail.data
         data['observaciones'] = form.observaciones.data

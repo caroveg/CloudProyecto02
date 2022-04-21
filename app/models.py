@@ -58,6 +58,7 @@ class Concurso(db.Model):
 
 class Participante(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    participante_id = db.Column( db.String(250) )
     concurso_id = db.Column(db.Integer, db.ForeignKey('concurso.id', ondelete='CASCADE'), nullable=False)
     url = db.Column( db.String(250) )
     path_audio = db.Column( db.String(250), nullable=False )

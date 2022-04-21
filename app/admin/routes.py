@@ -1,3 +1,4 @@
+#ROUTE ADMIN
 from flask import render_template, redirect, url_for, request,send_file, send_from_directory, flash
 from flask_login import login_required, current_user
 from datetime import datetime
@@ -15,7 +16,7 @@ tconcurso = dynamodb.Table('concurso')
 tparticipante =  dynamodb.Table('participante')
 
 @admin_bp.route("/admin/concurso/", methods=['GET', 'POST'], defaults={'concurso_id': None})
-@admin_bp.route("/admin/concurso/<int:concurso_id>/", methods=['GET', 'POST','PUT'])
+@admin_bp.route("/admin/concurso/<string:concurso_id>/", methods=['GET', 'POST','PUT'])
 @login_required
 def concurso_form(concurso_id): 
     form = ConcursoForm()  
@@ -92,7 +93,6 @@ def concurso_update(url):
         
         data = dict((k, v) for k, v in data.items() if v)
 
-        # Save data in DynamoDb to update table
         response = tconcurso.put_item(Item=data)
 
         if response:
@@ -100,12 +100,20 @@ def concurso_update(url):
 
     return render_template('concurso_form.html', form=form)
 
-@admin_bp.route("/participanteDelete/<int:participante_id>/", methods=['GET', 'POST'])   
+@admin_bp.route("/participanteDelete/<string:participante_id>/", methods=['GET', 'POST'])   
 def  participante_delete(participante_id):
-    participante = Participante.get_by_id(participante_id)
-    os.remove("app/static/AudioFilesDestiny/{}".format(participante.path_audio))
-    os.remove("app/static/AudioFilesOrigin/{}".format(participante.path_audio_origin))	
-    participante.delete()
+    #response = tparticipante.get_item(
+    #    Key={'Participante_id': participante_id}
+    #    )
+    #data = response.get('Item')
+
+    #os.remove("app/static/AudioFilesDestiny/{}".format(data.get('path_audio')))
+    #os.remove("app/static/AudioFilesOrigin/{}".format(data.get('path_audio_origin')))	
+    print(participante_id)
+    response = tparticipante.delete_item(
+        Key={'Participante_id': participante_id}
+        )
+
     return redirect(url_for('public.index'))
 
 
