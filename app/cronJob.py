@@ -1,12 +1,18 @@
 from email.mime import audio
 from .models import Participante
 import os
-
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 import boto3
 import botocore
+
+from . import dynamodb
+import uuid
+
+sqs = boto3.resource('sqs', region_name='us-east-1')
+queue = sqs.get_queue_by_name(QueueName='sqsdespd')
+client = boto3.client('sqs',region_name='us-east-1')
 
 HEADER_EXITO='Tu audio ya se convirtio!'
 HEADER_FALLA='Problemas con tu audio'
@@ -18,6 +24,7 @@ MAIN_PATH=os.path.dirname(__file__)
 PATH_AUDIOS_NEW_S3 = "AudioFilesDestiny/audio_%s.mp3"
 NEW_FILE_NAME = "audio_%s.mp3"
 BUCKET_NAME_S3 = "storagedespd"
+tparticipante =  dynamodb.Table('participante')
 
 
 def generateMailParticipante(nombre,recipient,mensaje,header):
@@ -74,24 +81,54 @@ def procesarAudio(path,audio_id):
     
     return f'audio_{audio_id}.mp3'
 
+def procesoparticipante(participante_id):
+    response = tparticipante.get_item(
+        Key={'Participante_id': participante_id}
+        )
+    data = response.get('Item')
+             
+    audio = data.get('path_audio') 
+    mailParticipante =  data.get('mail')
+    nombre = data.get('nombres') 
+    id = data.get('Participante_id') 
+    
+    try:
+        newPath=procesarAudio(audio,id)
+        generateMailParticipante(nombre,mailParticipante,MENSAJE_EXITO,HEADER_EXITO)
+
+        response = tparticipante.get_item(Key={'Participante_id': id})
+        data = response.get('Item')
+                    
+        data['path_audio_origin'] = participante.get('path_audio_origin')
+        data['path_audio'] = newPath
+        data['Participante_id'] = id
+        data['mail'] = participante.get('mail')
+        data['observaciones'] = participante.get('observaciones')
+        data['convertido'] = 'True'
+        data['id'] = 12
+        data['convertido'] = 'True'
+        data['url'] = participante.get('url')
+        data['fechaCreacion'] = participante.get('fechaCreacion')
+        data['nombres'] = participante.get('nombres')
+
+        data = dict((k, v) for k, v in data.items() if v)
+        response = tparticipante.put_item(Item=data)
+
+    except:
+            generateMailParticipante(nombre,mailParticipante,MENSAJE_FALLA,HEADER_FALLA)
+
 def jobAudios():
-        print("Job Audios")
-        participantes=Participante.get_no_procesados()
-        print(f'Participantes sin procesar {len(participantes)}')
-        for participante in participantes:
-            print(participante)
-            audio=participante.path_audio
-            mailParticipante=participante.mail
-            nombre=participante.nombres
-            id=participante.id
-            try:
-                newPath=procesarAudio(audio,id)
-                generateMailParticipante(nombre,mailParticipante,MENSAJE_EXITO,HEADER_EXITO)
-                participante.path_audio=newPath
-                participante.convertido=True
-                participante.update()
-            except:
-                generateMailParticipante(nombre,mailParticipante,MENSAJE_FALLA,HEADER_FALLA)
+        messages = client.receive_message(QueueUrl=queue.url,MaxNumberOfMessages=10)
+
+        if 'Messages' in messages:
+            for message in messages['Messages']:
+                id=str(message['Body'])
+                procesoparticipante(id)
+                client.delete_message(QueueUrl=queue.url,ReceiptHandle=message['ReceiptHandle'])
+        else:
+            print('Queue is now empty')
+
+        
 
 
 

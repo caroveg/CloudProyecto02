@@ -2,10 +2,25 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
+import boto3
 
 login_manager = LoginManager()
 db = SQLAlchemy()
 scheduler = APScheduler()
+
+import requests
+r = requests.get("http://169.254.169.254/latest/meta-data/iam/security-credentials/EMR_EC2_DefaultRole")
+response_json = r.json()
+v_access_key_id=response_json.get('AccessKeyId')
+v_secret_access_key=response_json.get('SecretAccessKey')
+v_session_token=response_json.get('Token')
+
+dynamodb = boto3.resource('dynamodb',
+    aws_access_key_id=v_access_key_id,
+    aws_secret_access_key=v_secret_access_key,
+	aws_session_token=v_session_token,
+    region_name='us-east-1'
+)
 
 def create_app():
 
