@@ -25,6 +25,14 @@ def concurso_form(concurso_id):
         path_imagen = secure_filename(form.imagen.data.filename)
         form.imagen.data.save("app/static/images_concurso/" + path_imagen)
 
+        print(path_imagen)
+
+        s3 = boto3.resource('s3')
+        data = open("app/static/images_concurso/" + path_imagen, 'rb')
+        s3.Bucket("storagedespd").put_object(Key="images_concurso/" + path_imagen, Body=data)
+        os.remove("app/static/images_concurso/" + path_imagen)
+
+
         #Dynamo
         data = {}
         data['id'] = uuid.uuid4().hex
@@ -42,19 +50,22 @@ def concurso_form(concurso_id):
         data = dict((k, v) for k, v in data.items() if v)
 
         response = tconcurso.put_item(Item=data)
-        if response:
-            flash('Concurso creado correctamente')
 
-        #Almacenamiento en S3
-        s3 = boto3.resource('s3')
-        data = open("app/static/images_concurso/" + path_imagen, 'rb')
-        s3.Bucket("storagedespd").put_object(Key="images_concurso/" + path_imagen, Body=data)
-             
         return redirect(url_for('public.index'))
     return render_template("concurso_form.html", form=form)
 
 @admin_bp.route("/concursoDelete/<string:url>/", methods=['GET', 'POST'])   
 def  concurso_delete(url):
+    responseg = tconcurso.get_item(
+        Key={'url': url}
+        )
+    datag = responseg.get('Item')
+    pathimg = datag.get('imagen')
+
+    s3 = boto3.resource('s3')
+    s3.Object('storagedespd', 'images_concurso/' + pathimg).delete()
+    
+
     response = tconcurso.delete_item(
         Key={'url':url}
         )
@@ -102,18 +113,23 @@ def concurso_update(url):
 
 @admin_bp.route("/participanteDelete/<string:participante_id>/", methods=['GET', 'POST'])   
 def  participante_delete(participante_id):
-    #response = tparticipante.get_item(
-    #    Key={'Participante_id': participante_id}
-    #    )
-    #data = response.get('Item')
+    responseg = tparticipante.get_item(
+        Key={'Participante_id': participante_id}
+        )
+    datag = responseg.get('Item')
+    path_audio = datag.get('path_audio')
+    path_audio_origin = datag.get('path_audio_origin')
 
-    #os.remove("app/static/AudioFilesDestiny/{}".format(data.get('path_audio')))
-    #os.remove("app/static/AudioFilesOrigin/{}".format(data.get('path_audio_origin')))	
-    print(participante_id)
+    s3 = boto3.resource('s3')
+    s3.Object('storagedespd', 'AudioFilesOrigin/' + path_audio).delete()
+    s3.Object('storagedespd', 'AudioFilesDestiny/' + path_audio_origin).delete()
+    
+    
     response = tparticipante.delete_item(
         Key={'Participante_id': participante_id}
         )
-
+    #os.remove("app/static/AudioFilesDestiny/{}".format(data.get('path_audio')))
+    #os.remove("app/static/AudioFilesOrigin/{}".format(data.get('path_audio_origin')))	
     return redirect(url_for('public.index'))
 
 
