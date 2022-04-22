@@ -87,9 +87,10 @@ def participante_form(url):
 
         path_audio = secure_filename(form.path_audio.data.filename)
         form.path_audio.data.save("app/static/AudioFilesOrigin/" + path_audio)
+        part_id = uuid.uuid4().hex
 
         data = {}
-        data['Participante_id'] = uuid.uuid4().hex
+        data['Participante_id'] = part_id
         data['id'] = 11
         data['url'] = url
         data['nombres'] = form.nombres.data
@@ -112,6 +113,10 @@ def participante_form(url):
         data = open("app/static/AudioFilesOrigin/" + path_audio, 'rb')
         s3.Bucket("storagedespd").put_object(Key="AudioFilesOrigin/" + path_audio, Body=data)
         os.remove("app/static/AudioFilesOrigin/" + path_audio)
+
+        sqs = boto3.resource('sqs', region_name='us-east-1')
+        queue = sqs.get_queue_by_name(QueueName='sqsdespd')
+        response = queue.send_message(MessageBody = part_id)
 
         flash('Hemos recibido tu voz y la estamos procesando para que sea publicada en la \
                             página del concurso y pueda ser posteriormente revisada por nuestro equipo de trabajo. \
