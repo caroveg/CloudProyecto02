@@ -33,13 +33,13 @@ def generateMailParticipante(nombre,recipient,mensaje,header):
         to_emails= recipient ,
         subject= header,
         html_content= mensaje % nombre)
-    #try:
-   #sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+    try:
+    sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
     
-    #response = sg.send(message)
-    #print(response.status_code)
-    #print(response.body)
-    #print(response.headers)
+    response = sg.send(message)
+    print(response.status_code)
+    print(response.body)
+    print(response.headers)
     #except Exception as e:
         #print(e.message)
 
@@ -82,37 +82,44 @@ def procesarAudio(path,audio_id):
     return f'audio_{audio_id}.mp3'
 
 def procesoparticipante(participante_id):
+    print('Entra a proceso')
+    print(participante_id)
     response = tparticipante.get_item(
         Key={'Participante_id': participante_id}
         )
     data = response.get('Item')
+    print(data)
              
     audio = data.get('path_audio') 
     mailParticipante =  data.get('mail')
     nombre = data.get('nombres') 
-    id = data.get('Participante_id') 
     
     try:
-        newPath=procesarAudio(audio,id)
+
+        newPath=procesarAudio(audio,participante_id)
         generateMailParticipante(nombre,mailParticipante,MENSAJE_EXITO,HEADER_EXITO)
 
-        response = tparticipante.get_item(Key={'Participante_id': id})
-        data = response.get('Item')
-                    
-        data['path_audio_origin'] = participante.get('path_audio_origin')
-        data['path_audio'] = newPath
-        data['Participante_id'] = id
-        data['mail'] = participante.get('mail')
-        data['observaciones'] = participante.get('observaciones')
-        data['convertido'] = 'True'
-        data['id'] = 12
-        data['convertido'] = 'True'
-        data['url'] = participante.get('url')
-        data['fechaCreacion'] = participante.get('fechaCreacion')
-        data['nombres'] = participante.get('nombres')
+        response2 = tparticipante.get_item(Key={'Participante_id': participante_id})
+        datap = response2.get('Item')
 
-        data = dict((k, v) for k, v in data.items() if v)
-        response = tparticipante.put_item(Item=data)
+        data2 = {}              
+        data2['path_audio_origin'] = datap.get('path_audio_origin')
+        data2['path_audio'] = newPath
+        data2['Participante_id'] = participante_id
+        data2['mail'] = datap.get('mail')
+        data2['observaciones'] = datap.get('observaciones')
+        data2['convertido'] = 'True'
+        data2['id'] = 12
+        data2['url'] = datap.get('url')
+        data2['fechaCreacion'] = datap.get('fechaCreacion')
+        data2['nombres'] = datap.get('nombres')
+
+        print(data2)
+        print('insertando data2')
+        #data2 = dict((k, v) for k, v in data.items() if v)
+        response2 = tparticipante.put_item(Item=data2)
+        print(response2)
+        print('completado')
 
     except:
             generateMailParticipante(nombre,mailParticipante,MENSAJE_FALLA,HEADER_FALLA)
