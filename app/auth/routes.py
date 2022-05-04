@@ -9,12 +9,12 @@ from .models import User
 
 import redis
 
-REDIS_URL = 'redis://ecdespd.jxemj7.0001.use1.cache.amazonaws.com:6379'
-
+#REDIS_URL = 'redis://ecdespd.jxemj7.0001.use1.cache.amazonaws.com:6379'
+REDIS_URL = 'redis://localhost:6379'
 class SessionStore:
     """Store session data in Redis."""
 
-    def __init__(self, token, url='redis://localhost:6379', ttl=10):
+    def __init__(self, token, url=REDIS_URL, ttl=10):
         self.token = token
         self.redis = redis.Redis.from_url(url)
         self.ttl = ttl

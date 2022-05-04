@@ -12,11 +12,11 @@ db = SQLAlchemy()
 scheduler = APScheduler()
 
 import requests
-r = requests.get("http://169.254.169.254/latest/meta-data/iam/security-credentials/EMR_EC2_DefaultRole")
-response_json = r.json()
-v_access_key_id=response_json.get('AccessKeyId')
-v_secret_access_key=response_json.get('SecretAccessKey')
-v_session_token=response_json.get('Token')
+#r = requests.get("http://169.254.169.254/latest/meta-data/iam/security-credentials/EMR_EC2_DefaultRole")
+#response_json = r.json()
+v_access_key_id='ASIATGWEY6Q5ITLFL2NX'
+v_secret_access_key='qGpA7XkIxVjN7j32MyEfhmvSy04Z1H+LXEZaBf2y'
+v_session_token='FwoGZXIvYXdzELP//////////wEaDCBRzf4DuQB75H2JCiLKAQ8Sx31OTvCu7m8leJ+PJi6mBf5RXC53zdMcxONHrE7hQxWZNspPH0uoVAR3QHwjtwNiFYgfBLd8y+wzWTvL4bSQ6GC8sAu3llSuPBFl55C/9UT/m4Ox1LZC78nua161dfF/pmuKLTkivZilRe3AvrevfQgJPy4rYToxjXHWqhk3uHvUnMrhyX5/urfhsd+NLxcEg2JZ+I4E32YJvnyJgm6IdqLgVhCXpQsdBrTEApHC3VgfVIqbHyZ+uYJvVt2bw7FiDZc9B+aq/oMo66LHkwYyLa8khNk3bY74PxAiddJFq7PDcen1J5S5cJur9PRmPTgAebsNP9cAdtOXXtiUIw=='
 
 dynamodb = boto3.resource('dynamodb',
     aws_access_key_id=v_access_key_id,
@@ -24,8 +24,13 @@ dynamodb = boto3.resource('dynamodb',
 	aws_session_token=v_session_token,
     region_name='us-east-1'
 )
-
-
+s3 = boto3.resource(
+    service_name='s3',
+    region_name='us-east-1',
+    aws_access_key_id=v_access_key_id,
+    aws_secret_access_key=v_secret_access_key,
+    aws_session_token=v_session_token
+)
 #dynamodb = boto3.resource('dynamodb',
 #    aws_access_key_id='ASIATGWEY6Q5LVXJNPHS',
 #    aws_secret_access_key='dS+V8PEt5BShtfqjroI9//utf/cR3utbOwae93Lw',

@@ -7,7 +7,7 @@ from . import public_bp
 from .forms import ParticipanteForm
 import boto3  
 import os
-from .. import dynamodb
+from .. import dynamodb, s3
 from boto3.dynamodb.conditions import Key
 import uuid
 
@@ -109,7 +109,7 @@ def participante_form(url):
             flash('Participante creado correctamente')
        
         #Almacenamiento en S3
-        s3 = boto3.resource('s3')     
+        #s3 = boto3.resource('s3')     
         data = open("app/static/AudioFilesOrigin/" + path_audio, 'rb')
         s3.Bucket("storagedespd").put_object(Key="AudioFilesOrigin/" + path_audio, Body=data)
         os.remove("app/static/AudioFilesOrigin/" + path_audio)

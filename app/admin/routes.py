@@ -7,7 +7,7 @@ import os
 from app.models import Concurso, Participante
 from . import admin_bp
 from .forms import ConcursoForm
-from .. import dynamodb
+from .. import dynamodb, s3
 import uuid
 
 import boto3
@@ -22,12 +22,20 @@ def concurso_form(concurso_id):
     form = ConcursoForm()  
     if form.validate_on_submit():
 
+        
         path_imagen = secure_filename(form.imagen.data.filename)
+
+        if not os.path.isdir("app/static/images_concurso/"):
+            #pathlib.mkdir(upload_path, parents = True, exist_ok= True)
+            os.umask(0)
+            os.makedirs('app/static/images_concurso/')
+            #logging.info('Created directory {}'.format('app/static/images_concurso/'))
+
         form.imagen.data.save("app/static/images_concurso/" + path_imagen)
 
         print(path_imagen)
 
-        s3 = boto3.resource('s3')
+        #s3 = boto3.resource('s3')
         data = open("app/static/images_concurso/" + path_imagen, 'rb')
         s3.Bucket("storagedespd").put_object(Key="images_concurso/" + path_imagen, Body=data)
         os.remove("app/static/images_concurso/" + path_imagen)
@@ -62,7 +70,7 @@ def  concurso_delete(url):
     datag = responseg.get('Item')
     pathimg = datag.get('imagen')
 
-    s3 = boto3.resource('s3')
+    #s3 = boto3.resource('s3')
     s3.Object('storagedespd', 'images_concurso/' + pathimg).delete()
     
 
@@ -120,7 +128,7 @@ def  participante_delete(participante_id):
     path_audio = datag.get('path_audio')
     path_audio_origin = datag.get('path_audio_origin')
 
-    s3 = boto3.resource('s3')
+    #s3 = boto3.resource('s3')
     s3.Object('storagedespd', 'AudioFilesOrigin/' + path_audio).delete()
     s3.Object('storagedespd', 'AudioFilesDestiny/' + path_audio_origin).delete()
     
