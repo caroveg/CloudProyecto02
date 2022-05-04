@@ -31,6 +31,13 @@ s3 = boto3.resource(
     aws_secret_access_key=v_secret_access_key,
     aws_session_token=v_session_token
 )
+
+
+sqs = boto3.resource('sqs',
+ region_name='us-east-1',
+    aws_access_key_id=v_access_key_id,
+    aws_secret_access_key=v_secret_access_key,
+    aws_session_token=v_session_token)
 #dynamodb = boto3.resource('dynamodb',
 #    aws_access_key_id='ASIATGWEY6Q5LVXJNPHS',
 #    aws_secret_access_key='dS+V8PEt5BShtfqjroI9//utf/cR3utbOwae93Lw',

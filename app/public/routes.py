@@ -7,7 +7,7 @@ from . import public_bp
 from .forms import ParticipanteForm
 import boto3  
 import os
-from .. import dynamodb, s3
+from .. import dynamodb, s3, sqs
 from boto3.dynamodb.conditions import Key
 import uuid
 
@@ -114,7 +114,7 @@ def participante_form(url):
         s3.Bucket("storagedespd").put_object(Key="AudioFilesOrigin/" + path_audio, Body=data)
         os.remove("app/static/AudioFilesOrigin/" + path_audio)
 
-        sqs = boto3.resource('sqs', region_name='us-east-1')
+       # sqs = boto3.resource('sqs', region_name='us-east-1')
         queue = sqs.get_queue_by_name(QueueName='sqsdespd')
         response = queue.send_message(MessageBody = part_id)
 
