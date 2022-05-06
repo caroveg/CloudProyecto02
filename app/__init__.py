@@ -61,12 +61,12 @@ def create_app():
      
     app = Flask(__name__)
     app.config['CDN_DOMAIN'] = 'd25jsbtuwtqsio.cloudfront.net'
-    
+
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Jirafa159*@db01.crbchgb8swzt.us-east-1.rds.amazonaws.com/DB_DESP_C'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = 'Jirafa159*'
     app.config['SESSION_TYPE'] = 'memcached'
-    app.config['SESSION_MEMCACHED'] = pylibmc.Client(cache_servers.split(','), binary=True,
+    app.config['SESSION_MEMCACHED'] = pylibmc.Client(cache_servers, binary=True,
                        username=cache_user, password=cache_pass,
                        behaviors={
                             # Faster IO
