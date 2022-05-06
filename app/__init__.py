@@ -19,7 +19,6 @@ import requests
 v_access_key_id=os.environ.get('aws_access_key_id', '')
 v_secret_access_key=os.environ.get('aws_secret_access_key', '')
 v_session_token=os.environ.get('aws_session_token', '')
-v_session_token=os.environ.get('aws_session_token', '')
 
 cache_servers = os.environ.get('MEMCACHIER_SERVERS', '').split(',')
 cache_user = os.environ.get('MEMCACHIER_USERNAME', '')
