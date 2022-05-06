@@ -16,4 +16,4 @@ if __name__=='__main__':
     app.config['CDN_DOMAIN'] = 'd25jsbtuwtqsio.cloudfront.net'
     CDN(app)
 
-    app.run(debug=False,use_reloader=False,host="0.0.0.0", port=8081)
+    app.run(debug=True)
