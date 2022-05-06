@@ -36,7 +36,7 @@ def generateMailParticipante(nombre,recipient,mensaje,header):
         html_content= mensaje % nombre)
     
     sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-    sg = SendGridAPIClient('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')
+    sg = SendGridAPIClient('')
     response = sg.send(message)
     print(response.status_code)
     print(response.body)
