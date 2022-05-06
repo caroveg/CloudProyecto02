@@ -8,10 +8,44 @@ import boto3
 import bmemcached
 from flask_session import Session
 import pylibmc
+
+login_manager = LoginManager()
+db = SQLAlchemy()
+scheduler = APScheduler()
+
 import requests
-from flask_cdn import CDN
+#r = requests.get("http://169.254.169.254/latest/meta-data/iam/security-credentials/EMR_EC2_DefaultRole")
+#response_json = r.json()
+v_access_key_id=os.environ.get('aws_access_key_id', '')
+v_secret_access_key=os.environ.get('aws_secret_access_key', '')
+v_session_token=os.environ.get('aws_session_token', '')
+
+cache_servers = os.environ.get('MEMCACHIER_SERVERS', '').split(',')
+cache_user = os.environ.get('MEMCACHIER_USERNAME', '')
+cache_pass = os.environ.get('MEMCACHIER_PASSWORD', '')
+
+#mc = bmemcached.Client(cache_servers, username=cache_user, password=cache_pass)
+
+dynamodb = boto3.resource('dynamodb',
+    aws_access_key_id=v_access_key_id,
+    aws_secret_access_key=v_secret_access_key,
+	aws_session_token=v_session_token,
+    region_name='us-east-1'
+)
+s3 = boto3.resource(
+    service_name='s3',
+    region_name='us-east-1',
+    aws_access_key_id=v_access_key_id,
+    aws_secret_access_key=v_secret_access_key,
+    aws_session_token=v_session_token
+)
 
 
+sqs = boto3.resource('sqs',
+ region_name='us-east-1',
+    aws_access_key_id=v_access_key_id,
+    aws_secret_access_key=v_secret_access_key,
+    aws_session_token=v_session_token)
 #dynamodb = boto3.resource('dynamodb',
 #    aws_access_key_id='ASIATGWEY6Q5LVXJNPHS',
 #    aws_secret_access_key='dS+V8PEt5BShtfqjroI9//utf/cR3utbOwae93Lw',
@@ -21,52 +55,13 @@ from flask_cdn import CDN
 
 def create_app():
 
-    login_manager = LoginManager()
-    db = SQLAlchemy()
-    scheduler = APScheduler()
-
-
-    #r = requests.get("http://169.254.169.254/latest/meta-data/iam/security-credentials/EMR_EC2_DefaultRole")
-    #response_json = r.json()
-    v_access_key_id=os.environ.get('aws_access_key_id', '')
-    v_secret_access_key=os.environ.get('aws_secret_access_key', '')
-    v_session_token=os.environ.get('aws_session_token', '')
-
-    cache_servers = os.environ.get('MEMCACHIER_SERVERS', '').split(',')
-    cache_user = os.environ.get('MEMCACHIER_USERNAME', '')
-    cache_pass = os.environ.get('MEMCACHIER_PASSWORD', '')
-
-#mc = bmemcached.Client(cache_servers, username=cache_user, password=cache_pass)
-
-    dynamodb = boto3.resource('dynamodb',
-    aws_access_key_id=v_access_key_id,
-    aws_secret_access_key=v_secret_access_key,
-	aws_session_token=v_session_token,
-    region_name='us-east-1'
-)
-    s3 = boto3.resource(
-    service_name='s3',
-    region_name='us-east-1',
-    aws_access_key_id=v_access_key_id,
-    aws_secret_access_key=v_secret_access_key,
-    aws_session_token=v_session_token
-)
-
-
-    sqs = boto3.resource('sqs',
- region_name='us-east-1',
-    aws_access_key_id=v_access_key_id,
-    aws_secret_access_key=v_secret_access_key,
-    aws_session_token=v_session_token)
-     
     app = Flask(__name__)
-    app.config['CDN_DOMAIN'] = 'd25jsbtuwtqsio.cloudfront.net'
-
+ 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Jirafa159*@db01.crbchgb8swzt.us-east-1.rds.amazonaws.com/DB_DESP_C'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = 'Jirafa159*'
     app.config['SESSION_TYPE'] = 'memcached'
-    app.config['SESSION_MEMCACHED'] = pylibmc.Client(cache_servers, binary=True,
+    app.config['SESSION_MEMCACHED'] = pylibmc.Client(cache_servers.split(','), binary=True,
                        username=cache_user, password=cache_pass,
                        behaviors={
                             # Faster IO
@@ -86,8 +81,6 @@ def create_app():
                        })
 
     server_sesssion = Session(app)
-
-    CDN(app)
 
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
