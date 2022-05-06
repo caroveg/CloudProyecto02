@@ -1,4 +1,5 @@
 from email.mime import audio
+import logging
 from .models import Participante
 import os
 from sendgrid import SendGridAPIClient
@@ -7,12 +8,12 @@ from sendgrid.helpers.mail import Mail
 import boto3
 import botocore
 
-from . import dynamodb
+from . import dynamodb, s3, sqs, sqsR
 import uuid
 
-sqs = boto3.resource('sqs', region_name='us-east-1')
-queue = sqs.get_queue_by_name(QueueName='sqsdespd')
-client = boto3.client('sqs',region_name='us-east-1')
+
+queue = sqsR.get_queue_by_name(QueueName='sqsdespd')
+#client = boto3.client('sqs',region_name='us-east-1')
 
 HEADER_EXITO='Tu audio ya se convirtio!'
 HEADER_FALLA='Problemas con tu audio'
@@ -33,7 +34,7 @@ def generateMailParticipante(nombre,recipient,mensaje,header):
         to_emails= recipient ,
         subject= header,
         html_content= mensaje % nombre)
-    try:
+    
     sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
     
     response = sg.send(message)
@@ -51,15 +52,25 @@ def procesarAudio(path,audio_id):
     newfilename = NEW_FILE_NAME % audio_id
 
     path=PATH_AUDIOS_ORIGIN % path
-    path = os.path.join(MAIN_PATH, path)
+    pathf = os.path.join(MAIN_PATH, path)
     
     newPath=PATH_AUDIOS_NEW % audio_id
     newPath = os.path.join(MAIN_PATH, newPath)
 
     print('4. Descargar el audio desde S3 y lo pone en AudioFilesOrigin')    
-    s3 = boto3.resource('s3')
+    #s3 = boto3.resource('s3')
+    if not os.path.isdir('./app/static/AudioFilesOrigin/'):
+        #pathlib.mkdir(upload_path, parents = True, exist_ok= True)
+        os.umask(0)
+        os.makedirs('./app/static/AudioFilesOrigin/')
+        logging.info('Created directory {}'.format(pathf))
+    if not os.path.isdir('./app/static/AudioFilesDestiny/'):
+        #pathlib.mkdir(upload_path, parents = True, exist_ok= True)
+        os.umask(0)
+        os.makedirs('./app/static/AudioFilesDestiny/')
+        logging.info('Created directory {}'.format(pathf))
     try:
-        s3.Bucket('storagedespd').download_file(path_S3, path)
+        s3.Bucket('storagedespd').download_file(path_S3, pathf)
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == "404":
             print("The object does not exist.")
@@ -67,7 +78,7 @@ def procesarAudio(path,audio_id):
             raise
 
     print('6. Convertir el audio')  
-    cmd=f'ffmpeg -loglevel quiet -y -i {path} {newPath}'
+    cmd=f'ffmpeg -loglevel quiet -y -i {pathf} {newPath}'
     os.system(cmd)
 
     print('7. lo sube a S3') 
@@ -125,13 +136,13 @@ def procesoparticipante(participante_id):
             generateMailParticipante(nombre,mailParticipante,MENSAJE_FALLA,HEADER_FALLA)
 
 def jobAudios():
-        messages = client.receive_message(QueueUrl=queue.url,MaxNumberOfMessages=10)
+        messages = sqs.receive_message(QueueUrl=queue.url,MaxNumberOfMessages=10)
 
         if 'Messages' in messages:
             for message in messages['Messages']:
                 id=str(message['Body'])
                 procesoparticipante(id)
-                client.delete_message(QueueUrl=queue.url,ReceiptHandle=message['ReceiptHandle'])
+                sqs.delete_message(QueueUrl=queue.url,ReceiptHandle=message['ReceiptHandle'])
         else:
             print('Queue is now empty')
 

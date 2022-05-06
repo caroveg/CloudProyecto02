@@ -9,11 +9,15 @@ db = SQLAlchemy()
 scheduler = APScheduler()
 
 import requests
-r = requests.get("http://169.254.169.254/latest/meta-data/iam/security-credentials/EMR_EC2_DefaultRole")
-response_json = r.json()
-v_access_key_id=response_json.get('AccessKeyId')
-v_secret_access_key=response_json.get('SecretAccessKey')
-v_session_token=response_json.get('Token')
+# r = requests.get("http://169.254.169.254/latest/meta-data/iam/security-credentials/EMR_EC2_DefaultRole")
+# response_json = r.json()
+# v_access_key_id=response_json.get('AccessKeyId')
+# v_secret_access_key=response_json.get('SecretAccessKey')
+# v_session_token=response_json.get('Token')
+
+v_access_key_id='ASIATGWEY6Q5B46WJY5A'
+v_secret_access_key='s4BCm4sjN2Jb+N3Xll2xbaKVuJCjWknMyHO3BI6H'
+v_session_token='FwoGZXIvYXdzEPX//////////wEaDD2e9UJEL2fYeolITyLKAfuw5xogsLOruf4ls52q1kRU8mjIzME2sq6K2CuuNh3RJ9a3PzqisBH0INsT2VH9ujjACLcrpQjX9YeWNr0R/UoCgoQtwxjODa6JjH3REQkKm2IEHk2knWzIRnSCUCiLjyKc6tCflUTIOklOxpYKn/yvN4/ONrNKzy997/kXwcx0CmJ+zIg8qECbAgeu8Wv4rszWy/OWWefYsO1mnk21B0WDTApv4dTzm8j82Ju8DiIQltDOI7HcqarlsHhfpDK57d19pQYp1c4MUHkokvbVkwYyLajwwKZHmBeGT5JGjiRVoWudZL2h3XW74Iy9EAHdM1Jk3oPO3/JZD4WXx/6FKQ=='
 
 dynamodb = boto3.resource('dynamodb',
     aws_access_key_id=v_access_key_id,
@@ -22,9 +26,6 @@ dynamodb = boto3.resource('dynamodb',
     region_name='us-east-1'
 )
 
-v_access_key_id='ASIATGWEY6Q5ITLFL2NX'
-v_secret_access_key='qGpA7XkIxVjN7j32MyEfhmvSy04Z1H+LXEZaBf2y'
-v_session_token='FwoGZXIvYXdzELP//////////wEaDCBRzf4DuQB75H2JCiLKAQ8Sx31OTvCu7m8leJ+PJi6mBf5RXC53zdMcxONHrE7hQxWZNspPH0uoVAR3QHwjtwNiFYgfBLd8y+wzWTvL4bSQ6GC8sAu3llSuPBFl55C/9UT/m4Ox1LZC78nua161dfF/pmuKLTkivZilRe3AvrevfQgJPy4rYToxjXHWqhk3uHvUnMrhyX5/urfhsd+NLxcEg2JZ+I4E32YJvnyJgm6IdqLgVhCXpQsdBrTEApHC3VgfVIqbHyZ+uYJvVt2bw7FiDZc9B+aq/oMo66LHkwYyLa8khNk3bY74PxAiddJFq7PDcen1J5S5cJur9PRmPTgAebsNP9cAdtOXXtiUIw=='
 
 dynamodb = boto3.resource('dynamodb',
     aws_access_key_id=v_access_key_id,
@@ -33,7 +34,7 @@ dynamodb = boto3.resource('dynamodb',
     region_name='us-east-1'
 )
 
-s3 = boto3.resource(
+s3 = boto3.client(
     service_name='s3',
     region_name='us-east-1',
     aws_access_key_id=v_access_key_id,
@@ -42,8 +43,13 @@ s3 = boto3.resource(
 )
 
 
-sqs = boto3.resource('sqs',
+sqs = boto3.client('sqs',
  region_name='us-east-1',
+    aws_access_key_id=v_access_key_id,
+    aws_secret_access_key=v_secret_access_key,
+    aws_session_token=v_session_token)
+
+sqsR = boto3.resource('sqs',region_name='us-east-1',
     aws_access_key_id=v_access_key_id,
     aws_secret_access_key=v_secret_access_key,
     aws_session_token=v_session_token)
