@@ -30,13 +30,13 @@ tparticipante =  dynamodb.Table('participante')
 
 def generateMailParticipante(nombre,recipient,mensaje,header):
     message = Mail(
-        from_email='caro.castro.v@gmail.com',
+        from_email='cloud5202010@gmail.com',
         to_emails= recipient ,
         subject= header,
         html_content= mensaje % nombre)
     
     sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-    
+    sg = SendGridAPIClient('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')
     response = sg.send(message)
     print(response.status_code)
     print(response.body)

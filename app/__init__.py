@@ -34,13 +34,15 @@ dynamodb = boto3.resource('dynamodb',
     region_name='us-east-1'
 )
 
-s3 = boto3.client(
+s3 = boto3.resource(
     service_name='s3',
     region_name='us-east-1',
     aws_access_key_id=v_access_key_id,
     aws_secret_access_key=v_secret_access_key,
     aws_session_token=v_session_token
 )
+
+
 
 
 sqs = boto3.client('sqs',
