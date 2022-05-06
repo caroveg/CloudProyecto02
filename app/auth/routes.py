@@ -88,7 +88,7 @@ def login():
     
 @auth_bp.route('/logout')
 def logout():
-    logout_user('user_id')
+    logout_user()
     session.pop("user_id")
     return redirect(url_for('public.index'))
 
