@@ -7,7 +7,7 @@ from .. import login_manager
 from . import auth_bp
 from .forms import SignupForm, LoginForm
 from .models import User
-from .. import mc
+#from .. import mc
 import redis
 
 #REDIS_URL = 'redis://ecdespd.jxemj7.0001.use1.cache.amazonaws.com:6379'
