@@ -61,7 +61,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = 'Jirafa159*'
     app.config['SESSION_TYPE'] = 'memcached'
-    app.config['SESSION_MEMCACHED'] = pylibmc.Client(cache_servers.split(','), binary=True,
+    app.config['SESSION_MEMCACHED'] = pylibmc.Client(cache_servers, binary=True,
                        username=cache_user, password=cache_pass,
                        behaviors={
                             # Faster IO
