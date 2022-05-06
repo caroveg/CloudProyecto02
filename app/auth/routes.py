@@ -1,38 +1,40 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
+from flask_session import Session
 
 from app import login_manager
 from . import auth_bp
 from .forms import SignupForm, LoginForm
 from .models import User
-
+from .. import mc
 import redis
 
 #REDIS_URL = 'redis://ecdespd.jxemj7.0001.use1.cache.amazonaws.com:6379'
-REDIS_URL = 'redis://localhost:6379'
-class SessionStore:
-    """Store session data in Redis."""
+#REDIS_URL = 'redis://localhost:6379'
 
-    def __init__(self, token, url=REDIS_URL, ttl=10):
-        self.token = token
-        self.redis = redis.Redis.from_url(url)
-        self.ttl = ttl
+# class SessionStore:
+#     """Store session data in Redis."""
 
-    def set(self, key, value):
-        self.refresh()
-        return self.redis.hset(self.token, key, value)
+#     def __init__(self, token, url=REDIS_URL, ttl=10):
+#         self.token = token
+#         self.redis = redis.Redis.from_url(url)
+#         self.ttl = ttl
 
-    def get(self, key, value):
-        self.refresh()
-        return self.redis.hget(self.token, key)
+#     def set(self, key, value):
+#         self.refresh()
+#         return self.redis.hset(self.token, key, value)
 
-    def incr(self, key):
-        self.refresh()
-        return self.redis.hincrby(self.token, key, 1)
+#     def get(self, key, value):
+#         self.refresh()
+#         return self.redis.hget(self.token, key)
 
-    def refresh(self):
-        self.redis.expire(self.token, self.ttl)
+#     def incr(self, key):
+#         self.refresh()
+#         return self.redis.hincrby(self.token, key, 1)
+
+#     def refresh(self):
+#         self.redis.expire(self.token, self.ttl)
 
 
 @auth_bp.route("/signup/", methods=["GET", "POST"])
@@ -58,6 +60,7 @@ def show_signup_form():
                 user.save()
                 login_user(user, remember=True)
                 next_page = request.args.get('next', None)
+                session["user_id"] = user.id
                 if not next_page or url_parse(next_page).netloc != '':
                     next_page = url_for('public.index')
                     return redirect(next_page)
@@ -74,7 +77,8 @@ def login():
         user = User.get_by_email(form.email.data)
         if user is not None and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            store = SessionStore(user, REDIS_URL)
+            session["user_id"] = user.id
+            #store = SessionStore(user, REDIS_URL)
             next_page = request.args.get('next')
             if not next_page or url_parse(next_page).netloc != '':
                 next_page = url_for('public.principal')
@@ -84,12 +88,14 @@ def login():
     
 @auth_bp.route('/logout')
 def logout():
-    logout_user()
+    logout_user('user_id')
+    session.pop("user_id")
     return redirect(url_for('public.index'))
 
 
 @login_manager.user_loader
 def load_user(user_id):
-    store = redis.Redis.from_url(REDIS_URL)
+    #store = redis.Redis.from_url(REDIS_URL)
+    #session.pop("user_id")
     #store.expire(username, 10)
     return User.get_by_id(int(user_id))

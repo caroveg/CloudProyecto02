@@ -1,11 +1,13 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, session
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 import os
 from urllib.parse import urljoin
 import boto3
-
+import bmemcached
+from flask_session import Session
+import pylibmc
 
 login_manager = LoginManager()
 db = SQLAlchemy()
@@ -14,9 +16,16 @@ scheduler = APScheduler()
 import requests
 #r = requests.get("http://169.254.169.254/latest/meta-data/iam/security-credentials/EMR_EC2_DefaultRole")
 #response_json = r.json()
-v_access_key_id='ASIATGWEY6Q5ITLFL2NX'
-v_secret_access_key='qGpA7XkIxVjN7j32MyEfhmvSy04Z1H+LXEZaBf2y'
-v_session_token='FwoGZXIvYXdzELP//////////wEaDCBRzf4DuQB75H2JCiLKAQ8Sx31OTvCu7m8leJ+PJi6mBf5RXC53zdMcxONHrE7hQxWZNspPH0uoVAR3QHwjtwNiFYgfBLd8y+wzWTvL4bSQ6GC8sAu3llSuPBFl55C/9UT/m4Ox1LZC78nua161dfF/pmuKLTkivZilRe3AvrevfQgJPy4rYToxjXHWqhk3uHvUnMrhyX5/urfhsd+NLxcEg2JZ+I4E32YJvnyJgm6IdqLgVhCXpQsdBrTEApHC3VgfVIqbHyZ+uYJvVt2bw7FiDZc9B+aq/oMo66LHkwYyLa8khNk3bY74PxAiddJFq7PDcen1J5S5cJur9PRmPTgAebsNP9cAdtOXXtiUIw=='
+v_access_key_id=os.environ.get('aws_access_key_id', '')
+v_secret_access_key=os.environ.get('aws_secret_access_key', '')
+v_session_token=os.environ.get('aws_session_token', '')
+v_session_token=os.environ.get('aws_session_token', '')
+
+cache_servers = os.environ.get('MEMCACHIER_SERVERS', '').split(',')
+cache_user = os.environ.get('MEMCACHIER_USERNAME', '')
+cache_pass = os.environ.get('MEMCACHIER_PASSWORD', '')
+
+#mc = bmemcached.Client(cache_servers, username=cache_user, password=cache_pass)
 
 dynamodb = boto3.resource('dynamodb',
     aws_access_key_id=v_access_key_id,
@@ -52,12 +61,33 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Jirafa159*@db01.crbchgb8swzt.us-east-1.rds.amazonaws.com/DB_DESP_C'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = 'Jirafa159*'
+    app.config['SESSION_TYPE'] = 'memcached'
+    app.config['SESSION_MEMCACHED'] = pylibmc.Client(cache_servers.split(','), binary=True,
+                       username=cache_user, password=cache_pass,
+                       behaviors={
+                            # Faster IO
+                            'tcp_nodelay': True,
+                            # Keep connection alive
+                            'tcp_keepalive': True,
+                            # Timeout for set/get requests
+                            'connect_timeout': 2000, # ms
+                            'send_timeout': 750 * 1000, # us
+                            'receive_timeout': 750 * 1000, # us
+                            '_poll_timeout': 2000, # ms
+                            # Better failover
+                            'ketama': True,
+                            'remove_failed': 1,
+                            'retry_timeout': 2,
+                            'dead_timeout': 30,
+                       })
+
+    server_sesssion = Session(app)
 
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
 
     db.init_app(app)    
-
+    
     # Registro de los Blueprints
     from .auth import auth_bp
     app.register_blueprint(auth_bp)
@@ -72,8 +102,8 @@ def create_app():
     def createDB():
         db.create_all()
 
-    if __name__ == '__main__':
-        app.run(debug=True)
+    # if __name__ == '__main__':
+    #     app.run(debug=True)
 
     #if __name__ == '__main__':
         #app.run(host="0.0.0.0", port=8080, debug=False)

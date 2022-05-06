@@ -86,6 +86,11 @@ def participante_form(url):
     if form.validate_on_submit():
 
         path_audio = secure_filename(form.path_audio.data.filename)
+        if not os.path.isdir("app/static/AudioFilesOrigin/"):
+            #pathlib.mkdir(upload_path, parents = True, exist_ok= True)
+            os.umask(0)
+            os.makedirs('app/static/AudioFilesOrigin/')
+            #logging.info('Created directory {}'.format('app/static/images_concurso/'))
         form.path_audio.data.save("app/static/AudioFilesOrigin/" + path_audio)
         part_id = uuid.uuid4().hex
 
