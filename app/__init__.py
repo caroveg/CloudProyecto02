@@ -3,18 +3,16 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 import boto3
-
+import os
 login_manager = LoginManager()
 db = SQLAlchemy()
 scheduler = APScheduler()
 
 import requests
-# r = requests.get("http://169.254.169.254/latest/meta-data/iam/security-credentials/EMR_EC2_DefaultRole")
-# response_json = r.json()
-# v_access_key_id=response_json.get('AccessKeyId')
-# v_secret_access_key=response_json.get('SecretAccessKey')
-# v_session_token=response_json.get('Token')
 
+v_access_key_id=os.environ.get('aws_access_key_id', '')
+v_secret_access_key=os.environ.get('aws_secret_access_key', '')
+v_session_token=os.environ.get('aws_session_token', '')
 v_access_key_id='ASIATGWEY6Q5B46WJY5A'
 v_secret_access_key='s4BCm4sjN2Jb+N3Xll2xbaKVuJCjWknMyHO3BI6H'
 v_session_token='FwoGZXIvYXdzEPX//////////wEaDD2e9UJEL2fYeolITyLKAfuw5xogsLOruf4ls52q1kRU8mjIzME2sq6K2CuuNh3RJ9a3PzqisBH0INsT2VH9ujjACLcrpQjX9YeWNr0R/UoCgoQtwxjODa6JjH3REQkKm2IEHk2knWzIRnSCUCiLjyKc6tCflUTIOklOxpYKn/yvN4/ONrNKzy997/kXwcx0CmJ+zIg8qECbAgeu8Wv4rszWy/OWWefYsO1mnk21B0WDTApv4dTzm8j82Ju8DiIQltDOI7HcqarlsHhfpDK57d19pQYp1c4MUHkokvbVkwYyLajwwKZHmBeGT5JGjiRVoWudZL2h3XW74Iy9EAHdM1Jk3oPO3/JZD4WXx/6FKQ=='
