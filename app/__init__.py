@@ -15,7 +15,7 @@ from celery import Celery
 from hirefire.procs.celery import CeleryProc
 
 
-celery = Celery('myproject', broker='amqp://localhost//')
+celery = Celery('myproject', broker='amqp://guest@localhost//')
 
 class WorkerProc(CeleryProc):
     name = 'worker'
