@@ -50,7 +50,6 @@ python-http-client==3.3.7
 python-slugify==6.1.1
 pytz==2022.1
 pytz-deprecation-shim==0.1.0.post0
-redis==4.2.2
 requests==2.27.1
 s3transfer==0.5.2
 sendgrid==6.9.7
