@@ -18,8 +18,8 @@ from hirefire.procs.celery import CeleryProc
 celery = Celery('myproject', broker=os.environ['REDISCLOUD_URL'])
 
 class WorkerProc(CeleryProc):
-    name = 'worker'
-    queues = ['celery']
+    name = 'WEB'
+    queues = ['Response Time']
     app = celery
 
 
