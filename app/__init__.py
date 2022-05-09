@@ -15,7 +15,7 @@ from hirefire.contrib.flask.blueprint import build_hirefire_blueprint
 celery = Celery('myproject', broker=os.environ['REDISCLOUD_URL'])
 
 class WorkerProc(CeleryProc):
-    name = 'WEB'
+    name = 'WORKER'
     queues = ['celery']
     app = celery
 
