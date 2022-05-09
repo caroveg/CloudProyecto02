@@ -19,7 +19,7 @@ celery = Celery('myproject', broker=os.environ['REDISCLOUD_URL'])
 
 class WorkerProc(CeleryProc):
     name = 'WEB'
-    queues = ['Response Time']
+    queues = ['celery']
     app = celery
 
 
