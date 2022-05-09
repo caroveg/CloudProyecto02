@@ -8,6 +8,20 @@ import boto3
 import bmemcached
 from flask_session import Session
 import pylibmc
+import os
+from flask import Flask
+from hirefire.contrib.flask.blueprint import build_hirefire_blueprint
+from celery import Celery
+from hirefire.procs.celery import CeleryProc
+
+
+celery = Celery('myproject', broker='amqp://localhost//')
+
+class WorkerProc(CeleryProc):
+    name = 'worker'
+    queues = ['celery']
+    app = celery
+
 
 login_manager = LoginManager()
 db = SQLAlchemy()
@@ -87,6 +101,11 @@ def create_app():
 
     db.init_app(app)    
     
+    #registro hireFire blue print 
+    bp = build_hirefire_blueprint(os.environ['HIREFIRE_TOKEN'],
+                              ['hirefire.procs.celery.CeleryProc'])
+    app.register_blueprint(bp)
+
     # Registro de los Blueprints
     from .auth import auth_bp
     app.register_blueprint(auth_bp)
