@@ -7,8 +7,18 @@ import os
 login_manager = LoginManager()
 db = SQLAlchemy()
 scheduler = APScheduler()
-
+from celery import Celery
+from hirefire.procs.celery import CeleryProc
 import requests
+from hirefire.contrib.flask.blueprint import build_hirefire_blueprint
+
+celery = Celery('myproject', broker=os.environ['REDISCLOUD_URL'])
+
+class WorkerProc(CeleryProc):
+    name = 'WEB'
+    queues = ['celery']
+    app = celery
+
 
 v_access_key_id=os.environ.get('aws_access_key_id', '')
 v_secret_access_key=os.environ.get('aws_secret_access_key', '')
@@ -58,6 +68,10 @@ def create_app():
 
     app = Flask(__name__)
 
+
+    bp = build_hirefire_blueprint(os.environ['HIREFIRE_TOKEN'],
+                              ['app.WorkerProc'])
+    app.register_blueprint(bp)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Jirafa159*@db01.crbchgb8swzt.us-east-1.rds.amazonaws.com/DB_DESP_C'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = 'Jirafa159*'
