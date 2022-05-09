@@ -103,7 +103,7 @@ def create_app():
     
     #registro hireFire blue print 
     bp = build_hirefire_blueprint(os.environ['HIREFIRE_TOKEN'],
-                              ['WorkerProc'])
+                              ['app.WorkerProc'])
     app.register_blueprint(bp)
 
     # Registro de los Blueprints
