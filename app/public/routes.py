@@ -84,7 +84,7 @@ def show_participante(participante_id):
 def participante_form(url):
     form = ParticipanteForm(url)
     #form.validate_on_submit()
-    if True or form.validate_on_submit():
+    if form.validate_on_submit():
         
         logging.warning("FORM SUBMITED")
         file = request.files['path_audio']
