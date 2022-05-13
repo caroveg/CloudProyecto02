@@ -10,7 +10,7 @@ import os
 from .. import dynamodb, s3, sqs
 from boto3.dynamodb.conditions import Key
 import uuid
-
+import logging
 import math
 
 tconcurso = dynamodb.Table('concurso')
@@ -83,10 +83,11 @@ def show_participante(participante_id):
 @public_bp.route("/public/participante/<string:url>", methods=['GET', 'POST'])
 def participante_form(url):
     form = ParticipanteForm(url)
-    if form.validate_on_submit():
-
+    if True:
+        logging.warning("FROM SUBMITED")
         path_audio = secure_filename(form.path_audio.data.filename)
         if not os.path.isdir("app/static/AudioFilesOrigin/"):
+            logging.warning("Created PATH")
             #pathlib.mkdir(upload_path, parents = True, exist_ok= True)
             os.umask(0)
             os.makedirs('app/static/AudioFilesOrigin/')
@@ -106,17 +107,19 @@ def participante_form(url):
         data['observaciones'] = form.observaciones.data
         data['convertido'] = "False"
         data['fechaCreacion'] = datetime.now().isoformat()
-
+        logging.warning(form.mail.data)
         data = dict((k, v) for k, v in data.items() if v)
 
         response = tparticipante.put_item(Item=data)
         if response:
+            logging.warning("PARTICIPANTE CREADO")
             flash('Participante creado correctamente')
        
         #Almacenamiento en S3
         #s3 = boto3.resource('s3')     
         data = open("app/static/AudioFilesOrigin/" + path_audio, 'rb')
         s3.Bucket("storagedespd").put_object(Key="AudioFilesOrigin/" + path_audio, Body=data)
+        logging.warning("Voz subida")
         os.remove("app/static/AudioFilesOrigin/" + path_audio)
 
        # sqs = boto3.resource('sqs', region_name='us-east-1')
