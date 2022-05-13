@@ -84,62 +84,8 @@ def show_participante(participante_id):
 def participante_form(url):
     form = ParticipanteForm(url)
     #form.validate_on_submit()
-    if (form.validate_on_submit()):
-        
-        logging.warning("FORM SUBMITED")
-        file = request.files['path_audio']
-        path_audio = secure_filename(file.filename)
-        logging.warning(path_audio)
-        path_audio = secure_filename(form.path_audio.data.filename)
-        
-        if not os.path.isdir("app/static/AudioFilesOrigin/"):
-            logging.warning("Created PATH")
-            #pathlib.mkdir(upload_path, parents = True, exist_ok= True)
-            os.umask(0)
-            os.makedirs('app/static/AudioFilesOrigin/')
-            #logging.info('Created directory {}'.format('app/static/images_concurso/'))
-        form.path_audio.data.save("app/static/AudioFilesOrigin/" + path_audio)
-        part_id = uuid.uuid4().hex
-
-        data = {}
-        data['Participante_id'] = part_id
-        data['id'] = 11
-        data['url'] = url
-        data['nombres'] = form.nombres.data
-        data['path_audio'] = form.path_audio.data.filename
-        data['path_audio_origin'] = form.path_audio.data.filename
-        data['apellidos'] = form.url.data
-        data['mail'] = form.mail.data
-        data['observaciones'] = form.observaciones.data
-        data['convertido'] = "False"
-        data['fechaCreacion'] = datetime.now().isoformat()
-        logging.warning(form.mail.data)
-        logging.warning(form.path_audio.data.filename)
-        logging.warning(form.mail.data)
-        
-        data = dict((k, v) for k, v in data.items() if v)
-
-        response = tparticipante.put_item(Item=data)
-        if response:
-            logging.warning("PARTICIPANTE CREADO")
-            flash('Participante creado correctamente')
-       
-        #Almacenamiento en S3
-        #s3 = boto3.resource('s3')     
-        data = open("app/static/AudioFilesOrigin/" + path_audio, 'rb')
-        s3.Bucket("storagedespd").put_object(Key="AudioFilesOrigin/" + path_audio, Body=data)
-        logging.warning("Voz subida")
-        os.remove("app/static/AudioFilesOrigin/" + path_audio)
-
-       # sqs = boto3.resource('sqs', region_name='us-east-1')
-        queue = sqs.get_queue_by_name(QueueName='sqsdespd')
-        response = queue.send_message(MessageBody = part_id)
-
-        flash('Hemos recibido tu voz y la estamos procesando para que sea publicada en la \
-                            página del concurso y pueda ser posteriormente revisada por nuestro equipo de trabajo. \
-                            Tan pronto la voz quede publicada en la página, te notificaremos por email.')
-        return  redirect(url_for('public.participante_form',url=url))
-    else:
+    if (True):
+        form.validate_on_submit()
         logging.warning("FORM SUBMITED")
         file = request.files['path_audio']
         path_audio = secure_filename(file.filename)
