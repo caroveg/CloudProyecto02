@@ -146,7 +146,7 @@
                     {% endif %}
                     <td><p><p><ul><audio src="http://d25jsbtuwtqsio.cloudfront.net/AudioFilesDestiny/{{ participantes.path_audio }}" controls> <source src="http://d25jsbtuwtqsio.cloudfront.net/AudioFilesDestiny/{{ participantes.path_audio }}" type="audio/mp3" ></audio></ul></p></p></td>
                     <td><p><p><a href="http://d25jsbtuwtqsio.cloudfront.net/AudioFilesOrigin/{{ participantes.path_audio_origin }}" download>Descargar original</a></p></p></td>
-                     <td><p><p><a href="http://d25jsbtuwtqsio.cloudfront.net/AudioFilesOrigin/{{ participantes.path_audio }}">Descargar convertida</a></p></p></td>
+                     <td><p><p><a href="http://d25jsbtuwtqsio.cloudfront.net/AudioFilesDestiny/{{ participantes.path_audio }}">Descargar convertida</a></p></p></td>
                         <td><p><p><a href="{{ url_for('public.show_participante', participante_id= participantes.Participante_id) }}">Ver detalle</a></p></p></td>
                         <td><p><p><a href="{{ url_for('admin.participante_delete', participante_id= participantes.Participante_id) }}">Eliminar</a></p></p></td>
                     </tr>
