@@ -83,12 +83,12 @@ def show_participante(participante_id):
 @public_bp.route("/public/participante/<string:url>", methods=['GET', 'POST'])
 def participante_form(url):
     form = ParticipanteForm(url)
-    if True:
-        form.validate_on_submit()
-        logging.warning("FROM SUBMITED")
-        file = request.files['path_audio']
-        path_audio = secure_filename(file.filename)
-        logging.warning(path_audio)
+    if form.validate_on_submit():
+        
+        logging.warning("FORM SUBMITED")
+        #file = request.files['path_audio']
+        #path_audio = secure_filename(file.filename)
+        #logging.warning(path_audio)
         path_audio = secure_filename(form.path_audio.data.filename)
         
         if not os.path.isdir("app/static/AudioFilesOrigin/"):
