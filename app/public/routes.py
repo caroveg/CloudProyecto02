@@ -114,6 +114,7 @@ def participante_form(url):
         logging.warning(form.mail.data)
         logging.warning(form.path_audio.data.filename)
         logging.warning(form.mail.data)
+        
         data = dict((k, v) for k, v in data.items() if v)
 
         response = tparticipante.put_item(Item=data)
