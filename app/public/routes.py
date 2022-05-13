@@ -85,7 +85,11 @@ def participante_form(url):
     form = ParticipanteForm(url)
     if True:
         logging.warning("FROM SUBMITED")
+        file = request.files['path_audio']
+        path_audio = secure_filename(file.filename)
+        logging.warning(path_audio)
         path_audio = secure_filename(form.path_audio.data.filename)
+        
         if not os.path.isdir("app/static/AudioFilesOrigin/"):
             logging.warning("Created PATH")
             #pathlib.mkdir(upload_path, parents = True, exist_ok= True)
@@ -107,6 +111,8 @@ def participante_form(url):
         data['observaciones'] = form.observaciones.data
         data['convertido'] = "False"
         data['fechaCreacion'] = datetime.now().isoformat()
+        logging.warning(form.mail.data)
+        logging.warning(form.path_audio.data.filename)
         logging.warning(form.mail.data)
         data = dict((k, v) for k, v in data.items() if v)
 
